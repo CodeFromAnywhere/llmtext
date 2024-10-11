@@ -28,11 +28,15 @@ export default {
     request.headers.forEach((value, key) => (headers[key] = value));
 
     // Remove leading slash and decode the URL
-    let targetUrl = decodeURIComponent(request.url.slice(url.origin.length));
+    let targetUrl = decodeURIComponent(
+      request.url.slice(url.origin.length + 1),
+    );
+
     // If the targetUrl doesn't start with http:// or https://, prepend https://
     if (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://")) {
       targetUrl = "https://" + targetUrl;
     }
+
     if (targetUrl.startsWith("http") && url.pathname !== "/") {
       try {
         const parsedUrl = new URL(targetUrl);
