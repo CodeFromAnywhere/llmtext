@@ -29,17 +29,12 @@ export default {
 
     // Remove leading slash and decode the URL
     let targetUrl = decodeURIComponent(request.url.slice(url.origin.length));
-
+    // If the targetUrl doesn't start with http:// or https://, prepend https://
+    if (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://")) {
+      targetUrl = "https://" + targetUrl;
+    }
     if (targetUrl.startsWith("http") && url.pathname !== "/") {
       try {
-        // If the targetUrl doesn't start with http:// or https://, prepend https://
-        if (
-          !targetUrl.startsWith("http://") &&
-          !targetUrl.startsWith("https://")
-        ) {
-          targetUrl = "https://" + targetUrl;
-        }
-
         const parsedUrl = new URL(targetUrl);
         const hostname = parsedUrl.hostname.startsWith("www.")
           ? parsedUrl.hostname.toLowerCase().slice(4)
