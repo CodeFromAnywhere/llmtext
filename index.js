@@ -2,7 +2,7 @@ import welcome from "./welcome.html";
 
 const proxies = {
   "github.com": (url) => url.replace("g", "u"),
-  "npmjs.com": (url) => url.replace("s", "z"),
+  "npmjs.com": (url) => url.replace("js", "jz"),
   "youtube.com": (url) => url.replace("be", "do"),
   default: (url) => "https://r.jina.ai/" + url,
 };
@@ -36,7 +36,9 @@ export default {
     if (targetUrl.startsWith("http") && path !== "") {
       try {
         const parsedUrl = new URL(targetUrl);
-        const hostname = parsedUrl.hostname.toLowerCase();
+        const hostname = parsedUrl.hostname.toLowerCase().startsWith("www.")
+          ? parsedUrl.hostname.toLowerCase().slice(4)
+          : parsedUrl.hostname.toLowerCase();
         const fetchUrl = (proxies[hostname] || proxies.default)(targetUrl);
 
         const response = await fetch(fetchUrl, { headers });
