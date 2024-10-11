@@ -27,26 +27,26 @@ export default {
     const headers = {};
     request.headers.forEach((value, key) => (headers[key] = value));
 
-    console.log(
-      `Hello ${request.headers.get("User-Agent")} at path ${url.pathname}!`,
-    );
-    const path = url.pathname.slice(1);
-
     // Remove leading slash and decode the URL
-    let targetUrl = decodeURIComponent(path);
+    let targetUrl = decodeURIComponent(request.url.slice(url.origin.length));
 
     // If the targetUrl doesn't start with http:// or https://, prepend https://
     if (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://")) {
       targetUrl = "https://" + targetUrl;
     }
+    const parsedUrl = new URL(targetUrl);
+    const hostname = parsedUrl.hostname.startsWith("www.")
+      ? parsedUrl.hostname.toLowerCase().slice(4)
+      : parsedUrl.hostname.toLowerCase();
 
-    if (targetUrl.startsWith("http") && path !== "") {
+    console.log({ targetUrl, hostname });
+
+    if (targetUrl.startsWith("http") && url.pathname !== "/") {
       try {
-        const parsedUrl = new URL(targetUrl);
-        const hostname = parsedUrl.hostname.toLowerCase().startsWith("www.")
-          ? parsedUrl.hostname.toLowerCase().slice(4)
-          : parsedUrl.hostname.toLowerCase();
-        const fetchUrl = (proxies[hostname] || proxies.default)(targetUrl);
+        const fetchUrl = (proxies[hostname] || proxies.default)(
+          targetUrl.toLowerCase(),
+        );
+        console.log({ fetchUrl });
 
         const response = await fetch(fetchUrl, { headers });
         if (!response.ok) {
