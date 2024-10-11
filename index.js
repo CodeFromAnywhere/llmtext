@@ -1,5 +1,12 @@
 import welcome from "./welcome.html";
 
+const proxies = {
+  "github.com": (url) => url.replace("g", "u"),
+  "npmjs.com": (url) => url.replace("s", "z"),
+  "youtube.com": (url) => url.replace("be", "do"),
+  default: (url) => "https://r.jina.ai/" + url,
+};
+
 export default {
   /**
    * @param {Request} request
@@ -9,6 +16,10 @@ export default {
    */
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
+    const headers = {};
+    request.headers.forEach((value, key) => (headers[key] = value));
+
     console.log(
       `Hello ${request.headers.get("User-Agent")} at path ${url.pathname}!`,
     );
@@ -26,19 +37,29 @@ export default {
       try {
         const parsedUrl = new URL(targetUrl);
         const hostname = parsedUrl.hostname.toLowerCase();
+        const fetchUrl = (proxies[hostname] || proxies.default)(targetUrl);
 
-        let text;
-        if (hostname === "github.com") {
-          text = await fetchFromUithub(targetUrl);
-        } else if (hostname === "npmjs.com") {
-          text = await fetchFromNpmjz(targetUrl);
-        } else if (hostname === "youtube.com" || hostname === "youtu.be") {
-          text = await fetchFromYoutudo(targetUrl);
-        } else {
-          text = await fetchFromJina(targetUrl, env.JINA_API_KEY);
+        const response = await fetch(fetchUrl, { headers });
+        if (!response.ok) {
+          const text = await response.text();
+          return new Response(
+            `Request failed with status ${response.status}: ${text}`,
+            { status: response.status },
+          );
         }
 
-        return new Response(text);
+        const responseHeaders = {};
+        response.headers.forEach((value, key) => {
+          responseHeaders[key] = value;
+        });
+
+        const text = await response.text();
+
+        return new Response(text, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: responseHeaders,
+        });
       } catch (e) {
         return new Response("Error: " + e.message, { status: 500 });
       }
@@ -51,43 +72,3 @@ export default {
     });
   },
 };
-
-async function fetchFromUithub(url) {
-  const response = await fetch(url.replace("g", "u"));
-  if (!response.ok) {
-    throw new Error(`Uithub request failed with status ${response.status}`);
-  }
-  return await response.text();
-}
-
-async function fetchFromNpmjz(url) {
-  const response = await fetch(url.replace("s", "z"));
-  if (!response.ok) {
-    throw new Error(`Npmjz request failed with status ${response.status}`);
-  }
-  return await response.text();
-}
-
-async function fetchFromYoutudo(url) {
-  const response = await fetch(url.replace("be", "do"));
-  if (!response.ok) {
-    throw new Error(`Youtudo request failed with status ${response.status}`);
-  }
-  return await response.text();
-}
-
-async function fetchFromJina(url, apiKey) {
-  const response = await fetch("https://r.jina.ai/" + url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      // Authorization: `Bearer ${apiKey}`,
-    },
-    // body: JSON.stringify({ url }),
-  });
-  if (!response.ok) {
-    throw new Error(`Jina request failed with status ${response.status}`);
-  }
-  const text = await response.text();
-  return text;
-}
