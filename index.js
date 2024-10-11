@@ -4,7 +4,14 @@ const proxies = {
   "github.com": (url) => url.replace("g", "u"),
   "npmjs.com": (url) => url.replace("js", "jz"),
   "youtube.com": (url) => url.replace("be", "do"),
+  // TODO: put serper behind it in the google url structure
+  "google.com": (url) => url.replace("e", "lm"),
+  // TODO: replace with entire sitemap scrape with firecrawl.dev
   default: (url) => "https://r.jina.ai/" + url,
+  /** 
+   TODO: x.com, linkedin.com, etc.
+   (use user oauth)
+   */
 };
 
 export default {

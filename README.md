@@ -11,6 +11,4 @@ TODO:
 
 - ✅ integrate with npmjz, uithub, and youtudo
 - ✅ for all else, use r.jina.ai with api key
-- pass accept header properly
-- make google -> serper
--
+- ✅ pass accept header properly
