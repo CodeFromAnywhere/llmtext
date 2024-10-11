@@ -1,0 +1,15 @@
+name = "llmtext"
+main = "index.js"
+compatibility_date = "2024-10-11"
+
+workers_dev = true
+
+[vars]
+JINA_API_KEY = "your_jina_api_key_here"
+
+[env.production]
+routes = [
+  { pattern = "llmtext.com", custom_domain = true },
+  { pattern = "www.llmtext.com", custom_domain = true }
+]
+zone_id = "360a688b3f78735ea1b6009b1fe973cd"
