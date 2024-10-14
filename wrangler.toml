@@ -4,6 +4,8 @@ compatibility_date = "2024-10-11"
 
 workers_dev = true
 
+assets = { directory = "./" }
+
 [vars]
 JINA_API_KEY = "your_jina_api_key_here"
 

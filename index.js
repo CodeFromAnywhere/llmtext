@@ -1,5 +1,3 @@
-import welcome from "./welcome.html";
-
 const proxies = {
   "github.com": (url) => url.replace("g", "u"),
   "npmjs.com": (url) => url.replace("js", "jz"),
@@ -77,7 +75,7 @@ export default {
       }
     }
 
-    return new Response(welcome, {
+    return new Response("Path not found", {
       headers: {
         "content-type": "text/html",
       },
